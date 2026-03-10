@@ -25,7 +25,7 @@ logger = setup_logging()
 
 
 def section(title: str) -> None:
-    separator = "─" * 70
+    separator = "─" * 80
     logger.info(f"\n{separator}\n  {title}\n{separator}")
 
 

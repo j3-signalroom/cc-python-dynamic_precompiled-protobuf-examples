@@ -65,13 +65,13 @@ def main() -> None:
     kafka_cfg = cfg if args.mode == "full" else None
     sr        = SchemaRegistryClient(cfg["sr_url"], cfg["sr_api_key"], cfg["sr_api_secret"])
 
-    logger.info("=" * 70)
-    logger.info("  Confluent Cloud — Protobuf SerDes Demo")
+    logger.info("=" * 100)
+    logger.info("  Confluent Cloud Python Protobuf CSFLE (Client-Side Field-Level Encryption) Example Demo(s)")
     logger.info(f"  Python {sys.version.split()[0]}  |  mode={args.mode}  |  run_id={run_id}")
     logger.info(f"  SR:    {cfg['sr_url']}")
     if kafka_cfg:
         logger.info(f"  Kafka: {cfg['bootstrap_servers']}")
-    logger.info("=" * 70)
+    logger.info("=" * 100)
 
     # Pre-create all topics required by the demos before any produce calls
     if kafka_cfg:
@@ -115,7 +115,7 @@ def main() -> None:
     if run_all or args.demo == "csfle":
         demo_csfle(sr, kafka_cfg, run_id, cfg.get("aws_kms_key_arn", ""))
 
-    logger.info(f"\n{'─' * 70}")
+    logger.info(f"\n{'─' * 100}")
     logger.info(f"  Done. All topics/subjects use suffix '-{run_id}'.")
     logger.info("  To clean up subjects in Confluent Cloud CLI:")
     logger.info(f"    confluent schema-registry subject list | grep '{run_id}' | \\")
