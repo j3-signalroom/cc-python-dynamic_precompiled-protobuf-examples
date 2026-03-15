@@ -84,7 +84,7 @@ def get_config() -> tuple[dict, list[str]]:
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(
-        description="Confluent Cloud Python Dynamic or Precompiled Protobuf Example Demos",
+        description="Confluent Cloud Python Dynamic or Precompiled Protobuf Examples",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=textwrap.dedent("""\
             flags:
