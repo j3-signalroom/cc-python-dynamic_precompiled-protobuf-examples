@@ -113,6 +113,9 @@ fi
 
 # ── Terraform: provision the KMS KEK when CSFLE demo is selected ──────────
 if [ "$demo" = "csfle" ] || [ "$demo" = "all" ]; then
+    # Clean up any existing KMS resources from previous runs to ensure a clean slate for the demo
+    aws kms delete-alias --alias-name alias/confluent-csfle-kek --region $AWS_REGION || print_warn "KMS alias not found, skipping deletion"
+
     print_step "Provisioning KMS KEK via Terraform..."
 
     # Configuration folders
