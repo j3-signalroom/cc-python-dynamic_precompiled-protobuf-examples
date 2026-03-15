@@ -140,14 +140,9 @@ if [ "$demo" = "csfle" ] || [ "$demo" = "all" ]; then
     print_info "Initializing Terraform..."
     terraform init
 
-    # Plan Terraform
-    print_info "Running Terraform plan..."
-    terraform plan -out=tfplan > tfplan.out
-    
     # Apply Terraform
     print_info "Applying Terraform plan..."
-    terraform apply tfplan 
-    rm tfplan
+    terraform apply -auto-approve
     print_info "Infrastructure deployed successfully!"
 
     print_info "Creating the Terraform visualization..."
