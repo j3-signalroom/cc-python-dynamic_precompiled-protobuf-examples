@@ -1,10 +1,10 @@
-# Confluent Cloud Python Dynamic or Static Protobuf Example
+# Confluent Cloud Python Dynamic or Precompiled Protobuf Example
 A hands-on Python demonstration of the **Confluent Cloud Protobuf Schema Serializer & Deserializer**, covering every major concept from the official [Confluent Protobuf SerDes documentation](https://docs.confluent.io/cloud/current/sr/fundamentals/serdes-develop/serdes-protobuf.html).
 
 The project talks to a Confluent Cloud Schema Registry over the SR REST API and, when run in `full` mode, produces and consumes messages on a Kafka cluster via `confluent-kafka`. It supports two Protobuf modes:
 
 - **Dynamic (default)** — schemas are defined as Python dataclasses, compiled at runtime into `google.protobuf` `FileDescriptorProto` objects, and serialized to **Protobuf binary** using `google.protobuf.message_factory`. No `protoc` compiler or generated stubs are required.
-- **Static (`--use-protoc`)** — schemas are pre-compiled from `.proto` files in the `schemas/` directory into `_pb2.py` stubs via `protoc`, then wrapped by `CompiledProtoMessage` for better performance and compile-time type safety.
+- **Precompiled (`--use-protoc`)** — schemas are pre-compiled from `.proto` files in the `schemas/` directory into `_pb2.py` stubs via `protoc`, then wrapped by `CompiledProtoMessage` for better performance and compile-time type safety.
 
 Both modes satisfy the `ProtoSchema` protocol and are interchangeable in the SerDes layer.
 
@@ -64,7 +64,7 @@ Both modes satisfy the `ProtoSchema` protocol and are interchangeable in the Ser
 ### **1.1 Project layout**
 
 ```
-cc-python-dynamic_static-protobuf-example/
+cc-python-dynamic_precompiled-protobuf-example/
 ├── src
 │   ├── constants.py                 # DEFAULT_TOOL_LOG_FILE, DEFAULT_TOOL_LOG_FORMAT
 │   ├── utilities.py                 # setup_logging(), get_config(), parse_args() — logging, env config, CLI
@@ -374,8 +374,8 @@ Curious to learn more about [Astral](https://astral.sh/)'s `uv`? Check these out
 ### **1.4 Setup**
 
 ```bash
-git clone https://github.com/j3-signalroom/cc-python-dynamic_static-protobuf-example
-cd cc-python-dynamic_static-protobuf-example
+git clone https://github.com/j3-signalroom/cc-python-dynamic_precompiled-protobuf-example
+cd cc-python-dynamic_precompiled-protobuf-example
 
 # Create .venv and install exact pinned versions from uv.lock
 uv sync
@@ -525,7 +525,7 @@ language toolchains.
 
 #### **1.8.4 `CompiledProtoMessage` / `compile_protos` / `load_compiled_message` (`compiled_protobuf_helpers.py`)**
 
-Provides the static (protoc-compiled) counterpart to the dynamic `ProtoMessage` approach.
+Provides the precompiled (protoc-compiled) counterpart to the dynamic `ProtoMessage` approach.
 Activated by the `--use-protoc` CLI flag.
 
 **`compile_protos(proto_dir)`** — Locates the `protoc` binary on `PATH`, then compiles
@@ -550,7 +550,7 @@ type safety.
 | `deserialize(raw)` | `ParseFromString` → `MessageToDict` using the compiled message class |
 | `save_schema(directory)` | Writes the `.proto` schema text to `directory/{file_name}` |
 
-> **Note:** Static mode uses the global `descriptor_pool`, so it cannot load two versions
+> **Note:** Precompiled mode uses the global `descriptor_pool`, so it cannot load two versions
 > of the same message name simultaneously (unlike the dynamic per-instance pool approach).
 > This makes it unsuitable for schema-evolution demos that register multiple versions.
 
@@ -625,7 +625,7 @@ by `utilities.setup_logging()`:
 | Handler | Level | Output |
 |---|---|---|
 | `console` | `DEBUG` | stdout |
-| `file` | `INFO` | `cc-python-dynamic_static-protobuf-example.log` (overwritten each run, mode `w`) |
+| `file` | `INFO` | `cc-python-dynamic_precompiled-protobuf-example.log` (overwritten each run, mode `w`) |
 
 Log format: `YYYY-MM-DD HH:MM:SS - LEVEL - function_name - message`
 
@@ -842,7 +842,7 @@ schema governance).
 
 ## **3.0 Terraform — AWS KMS Provisioning**
 
-The `terraform/` directory contains Infrastructure as Code that provisions the AWS KMS key used as the Key Encryption Key (KEK) for the CSFLE demo. The configuration uses **Terraform Cloud** (organization: `signalroom`, workspace: `cc-python-dynamic-static-protobuf-example`) for remote state management.
+The `terraform/` directory contains Infrastructure as Code that provisions the AWS KMS key used as the Key Encryption Key (KEK) for the CSFLE demo. The configuration uses **Terraform Cloud** (organization: `signalroom`, workspace: `cc-python-dynamic-precompiled-protobuf-example`) for remote state management.
 
 ### **3.1 What it provisions**
 
@@ -916,9 +916,9 @@ done
 - **`uv.lock` should be committed.** It pins every transitive dependency for
   fully reproducible installs across machines and CI.
 - **Real Protobuf binary encoding.** Both `ProtoMessage` (dynamic) and
-  `CompiledProtoMessage` (static) produce real Protobuf binary on the wire.
+  `CompiledProtoMessage` (precompiled) produce real Protobuf binary on the wire.
   The dynamic path uses `google.protobuf.message_factory` with runtime-constructed
-  `FileDescriptorProto` objects — no `protoc` required. The static path
+  `FileDescriptorProto` objects — no `protoc` required. The precompiled path
   (`--use-protoc`) compiles `.proto` files from `schemas/` into `_pb2.py` stubs
   via `protoc` for better performance and compile-time type safety. Both satisfy
   the `ProtoSchema` protocol and are interchangeable in the SerDes layer.

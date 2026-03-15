@@ -3,7 +3,7 @@ terraform {
       organization = "signalroom"
 
         workspaces {
-            name = "cc-python-dynamic-static-protobuf-example"
+            name = "cc-python-dynamic-precompiled-protobuf-example"
         }
     }
 
