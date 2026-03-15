@@ -27,8 +27,8 @@ Both modes satisfy the `ProtoSchema` protocol and are interchangeable in the Ser
         + [1.8.2 `ProtoSchema` (`proto_schema.py`)](#182-protoschema-proto_schemapy)
         + [1.8.3 `ProtoMessage` / `ProtoField` (`dynamic_protobuf_helpers.py`)](#183-protomessage--protofield-dynamic_protobuf_helperspy)
         + [1.8.4 `CompiledProtoMessage` / `compile_protos` / `load_compiled_message` (`compiled_protobuf_helpers.py`)](#184-compiledprotomessage--compile_protos--load_compiled_message-compiled_protobuf_helperspy)
-        + [1.8.5 `KafkaProtobufSerializer` (`kafka_protobuf_serdes.py`)](#185-kafkaprotobufserializer-kafka_protobuf_serdespy)
-        + [1.8.6 `KafkaProtobufDeserializer` (`kafka_protobuf_serdes.py`)](#186-kafkaprotobufdeserializer-kafka_protobuf_serdespy)
+        + [1.8.5 `CustomProtobufSerializer` (`custom_protobuf_serdes.py`)](#185-kafkaprotobufserializer-custom_protobuf_serdespy)
+        + [1.8.6 `CustomProtobufDeserializer` (`custom_protobuf_serdes.py`)](#186-kafkaprotobufdeserializer-custom_protobuf_serdespy)
         + [1.8.7 `kafka_helpers.py`](#187-kafka_helperspy)
         + [1.8.8 `utilities.py`](#188-utilitiespy)
         + [1.8.9 `demos.py`](#189-demospy)
@@ -72,7 +72,7 @@ cc-python-dynamic_static-protobuf-example/
 │   ├── proto_schema.py              # ProtoSchema Protocol — common interface for dynamic & compiled schemas
 │   ├── dynamic_protobuf_helpers.py  # ProtoMessage & ProtoField — dynamic proto3 schema builders
 │   ├── compiled_protobuf_helpers.py # CompiledProtoMessage, compile_protos(), load_compiled_message() — protoc stubs
-│   ├── kafka_protobuf_serdes.py     # KafkaProtobufSerializer & KafkaProtobufDeserializer
+│   ├── custom_protobuf_serdes.py     # CustomProtobufSerializer & CustomProtobufDeserializer
 │   ├── kafka_helpers.py             # ensure_topics(), kafka_produce(), kafka_consume_one()
 │   ├── demos.py                     # All ten demo functions (demo_basic … demo_no_auto_register)
 │   ├── main.py                      # Thin entry point — wires config, SR client, and demo dispatch
@@ -224,9 +224,9 @@ flowchart TB
     end
 
     %% ── SerDes ──────────────────────────────────────────────────────────
-    subgraph SERDES["SerDes  (kafka_protobuf_serdes.py)"]
+    subgraph SERDES["SerDes  (custom_protobuf_serdes.py)"]
         direction LR
-        subgraph KSER["KafkaProtobufSerializer"]
+        subgraph KSER["CustomProtobufSerializer"]
             STRAT["SubjectNameStrategy\nTopicName · RecordName\nTopicRecordName"]
             REFSTRAT["ReferenceSubjectNameStrategy\nDefault · Qualified"]
             AUTO["auto_register=True\n→ sr.register()\nor sr.get_version()"]
@@ -234,7 +234,7 @@ flowchart TB
             STRAT --> AUTO
             AUTO --> KSER_OUT
         end
-        subgraph KDES["KafkaProtobufDeserializer"]
+        subgraph KDES["CustomProtobufDeserializer"]
             KDES_IN["sr.decode_header(raw)\n→ schema_id + payload"]
             WARM["sr.get_schema_by_id()\nwarm cache"]
             SPEC["specific_type set?\n→ specific_type.deserialize()\nelse _schema_id_to_message lookup"]
@@ -485,7 +485,7 @@ used by `decode_header()` to skip the message-index varint array.
 A `typing.Protocol` (runtime-checkable) that defines the common interface for both
 dynamic (`ProtoMessage`) and compiled (`CompiledProtoMessage`) Protobuf schema objects.
 Any object exposing these attributes and methods can be used interchangeably by the
-SerDes layer (`KafkaProtobufSerializer` / `KafkaProtobufDeserializer`).
+SerDes layer (`CustomProtobufSerializer` / `CustomProtobufDeserializer`).
 
 | Attribute / Method | Purpose |
 |---|---|
@@ -554,18 +554,18 @@ type safety.
 > of the same message name simultaneously (unlike the dynamic per-instance pool approach).
 > This makes it unsuitable for schema-evolution demos that register multiple versions.
 
-#### **1.8.5 `KafkaProtobufSerializer` (`kafka_protobuf_serdes.py`)**
+#### **1.8.5 `CustomProtobufSerializer` (`custom_protobuf_serdes.py`)**
 
-Mirrors the Java `KafkaProtobufSerializer`. Resolves the SR subject from the
+Mirrors the Java `CustomProtobufSerializer`. Resolves the SR subject from the
 topic, message name, and `is_key` flag using the configured
 `subject_name_strategy`, then either auto-registers the schema or looks it up,
 and finally calls `sr.encode()` to wrap the payload in the Confluent wire
 format. Maintains a module-level `_schema_id_to_message` registry so the
 deserializer can resolve message classes by schema ID.
 
-#### **1.8.6 `KafkaProtobufDeserializer` (`kafka_protobuf_serdes.py`)**
+#### **1.8.6 `CustomProtobufDeserializer` (`custom_protobuf_serdes.py`)**
 
-Mirrors the Java `KafkaProtobufDeserializer`. Strips the wire-format header
+Mirrors the Java `CustomProtobufDeserializer`. Strips the wire-format header
 via `sr.decode_header()`, warms the schema cache via `get_schema_by_id()`,
 then either delegates to `specific_type.deserialize()` or looks up the
 message class from the module-level `_schema_id_to_message` registry
@@ -719,7 +719,7 @@ In `--mode=full`, the app calls `ensure_topics()` via `AdminClient` to pre-creat
 Builds two `ProtoMessage` objects (`OtherRecord` and `MyRecord`), registers
 them in dependency order (referenced schema first), and serializes a message
 into the Confluent wire format. Prints the magic byte (`0x00`), schema ID, and
-full hex payload. Deserializes back with `KafkaProtobufDeserializer` using
+full hex payload. Deserializes back with `CustomProtobufDeserializer` using
 `specific_type=my_record`. In `full` mode the wire bytes are produced to and
 consumed from Kafka.
 
@@ -824,7 +824,7 @@ pre-registered before any produce calls. The demo walks through three steps:
 
 1. **Step 1** — Manually registers an `Invoice` schema under `invoices-{run_id}-value`
    via `sr.register()` and prints the returned `schema_id`.
-2. **Step 2** — Creates a `KafkaProtobufSerializer(sr, auto_register=False)`,
+2. **Step 2** — Creates a `CustomProtobufSerializer(sr, auto_register=False)`,
    serializes an invoice record, and performs a round-trip deserialize (with an
    optional Kafka produce/consume in `--mode full`).
 3. **Step 3** — Shows the expected `RuntimeError` when the same serializer tries

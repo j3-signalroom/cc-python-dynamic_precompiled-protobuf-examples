@@ -17,7 +17,7 @@ class ProtoSchema(Protocol):
     Protobuf schema objects.
 
     Any object that exposes these attributes and methods can be used interchangeably
-    by the SerDes layer (KafkaProtobufSerializer / KafkaProtobufDeserializer).
+    by the SerDes layer (CustomProtobufSerializer / CustomProtobufDeserializer).
     """
     name: str
     file_name: str

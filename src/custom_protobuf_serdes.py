@@ -21,13 +21,12 @@ _schema_id_to_message: dict[int, "ProtoSchema"] = {}
 
 
 
-class KafkaProtobufSerializer:
+class CustomProtobufSerializer:
     """
-    Python equivalent of:
-      io.confluent.kafka.serializers.protobuf.KafkaProtobufSerializer
+    Custom Protobuf serializer that works with the ProtoSchema protocol.
 
-    Supports all three SubjectNameStrategies, both
-    ReferenceSubjectNameStrategies, and Confluent CSFLE.
+    Supports all three SubjectNameStrategies and both
+    ReferenceSubjectNameStrategies.
     """
 
     def __init__(
@@ -83,10 +82,9 @@ class KafkaProtobufSerializer:
         return self.sr.encode(schema_id, message.serialize(data))
 
 
-class KafkaProtobufDeserializer:
+class CustomProtobufDeserializer:
     """
-    Python equivalent of:
-      io.confluent.kafka.serializers.protobuf.KafkaProtobufDeserializer
+    Custom Protobuf deserializer that works with the ProtoSchema protocol.
 
     - specific_type set  → deserialize into that ProtoMessage (specific type)
     - specific_type None → return dict  (DynamicMessage equivalent)
@@ -114,7 +112,7 @@ class KafkaProtobufDeserializer:
         else:
             raise RuntimeError(
                 f"No message class registered for schema_id={schema_id}. "
-                "Pass specific_type= to KafkaProtobufDeserializer or serialize first."
+                "Pass specific_type= to CustomProtobufDeserializer or serialize first."
             )
 
         return data

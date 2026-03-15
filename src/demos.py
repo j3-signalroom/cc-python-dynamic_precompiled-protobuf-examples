@@ -7,7 +7,7 @@ import uuid
 from utilities import setup_logging
 from schema_registry_client import SchemaRegistryClient
 from dynamic_protobuf_helpers import ProtoMessage, ProtoField
-from kafka_protobuf_serdes import KafkaProtobufSerializer, KafkaProtobufDeserializer
+from custom_protobuf_serdes import CustomProtobufSerializer, CustomProtobufDeserializer
 from kafka_helpers import kafka_produce, kafka_consume_one
 
 
@@ -69,7 +69,7 @@ def demo_basic(sr: SchemaRegistryClient, kafka_cfg: dict | None, run_id: str, sa
     sr.register(f"other-{run_id}.proto", other_record.to_schema_string())
 
     topic = f"testproto-{run_id}"
-    ser   = KafkaProtobufSerializer(sr)
+    ser   = CustomProtobufSerializer(sr)
     wire  = ser.serialize(
         topic, my_record, {"f1": "value1", "f2": {"other_id": 123}},
         references=[
@@ -82,7 +82,7 @@ def demo_basic(sr: SchemaRegistryClient, kafka_cfg: dict | None, run_id: str, sa
     logger.info(f"\nWire format:  magic=0x{magic:02X}  schema_id={schema_id}  payload_len={len(wire)-5}")
     logger.info(f"Full hex: {wire.hex()}")
 
-    deser   = KafkaProtobufDeserializer(sr, specific_type=my_record)
+    deser   = CustomProtobufDeserializer(sr, specific_type=my_record)
     decoded = deser.deserialize(wire)
 
     if kafka_cfg:
@@ -172,8 +172,8 @@ def demo_evolution(sr: SchemaRegistryClient, kafka_cfg: dict | None, run_id: str
     except RuntimeError:
         pass  # subject doesn't exist yet; inherits global
 
-    ser   = KafkaProtobufSerializer(sr)
-    deser = KafkaProtobufDeserializer(sr)
+    ser   = CustomProtobufSerializer(sr)
+    deser = CustomProtobufDeserializer(sr)
 
     logger.info("\n── Schema v1 ──")
     logger.info(v1.to_schema_string())
@@ -298,8 +298,8 @@ def demo_oneof(sr: SchemaRegistryClient, kafka_cfg: dict | None, run_id: str, sa
         {"name": "Order.proto",    "subject": ord_subj,  "version": 1},
     ]
 
-    ser   = KafkaProtobufSerializer(sr)
-    deser = KafkaProtobufDeserializer(sr)
+    ser   = CustomProtobufSerializer(sr)
+    deser = CustomProtobufDeserializer(sr)
 
     events = [
         {"customer": {"customer_id": 42, "customer_name": "Alice",
@@ -354,8 +354,8 @@ def demo_null_handling(sr: SchemaRegistryClient, run_id: str, save_dir: str = ""
         logger.info(f"  Saved → {path}")
 
     topic = f"nullables-{run_id}"
-    ser   = KafkaProtobufSerializer(sr)
-    deser = KafkaProtobufDeserializer(sr)
+    ser   = CustomProtobufSerializer(sr)
+    deser = CustomProtobufDeserializer(sr)
 
     w1 = ser.serialize(topic, schema, {"name": "Bob"})
     w2 = ser.serialize(topic, schema, {"name": "Carol", "age": 30, "isActive": True})
@@ -658,7 +658,7 @@ def demo_no_auto_register(sr: SchemaRegistryClient, kafka_cfg: dict | None, run_
 
     # ── Step 2: Create serializer with auto_register=False ─────────────
     logger.info("\n[Step 2] Creating serializer with auto_register=False …")
-    ser = KafkaProtobufSerializer(sr, auto_register=False)
+    ser = CustomProtobufSerializer(sr, auto_register=False)
 
     data = {"invoice_id": "INV-2026-001", "vendor": "Acme Corp", "total": 1250.99}
     logger.info(f"  Serializing: {data}")
@@ -667,7 +667,7 @@ def demo_no_auto_register(sr: SchemaRegistryClient, kafka_cfg: dict | None, run_
     logger.info(f"  Wire bytes: {len(wire)} bytes")
 
     # ── Step 3: Deserialize to verify round-trip ───────────────────────
-    deser   = KafkaProtobufDeserializer(sr, specific_type=invoice)
+    deser   = CustomProtobufDeserializer(sr, specific_type=invoice)
     decoded = deser.deserialize(wire)
 
     if kafka_cfg:
@@ -681,7 +681,7 @@ def demo_no_auto_register(sr: SchemaRegistryClient, kafka_cfg: dict | None, run_
     # ── Step 4: Show that unregistered subjects fail ───────────────────
     logger.info("\n[Step 3] Demonstrating failure when subject is not pre-registered …")
     unknown_topic = f"unknown-{run_id}"
-    ser_no_auto   = KafkaProtobufSerializer(sr, auto_register=False)
+    ser_no_auto   = CustomProtobufSerializer(sr, auto_register=False)
     try:
         ser_no_auto.serialize(unknown_topic, invoice, data)
         logger.info("  (serialize succeeded unexpectedly)")
