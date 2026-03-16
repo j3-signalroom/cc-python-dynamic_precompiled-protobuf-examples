@@ -31,23 +31,23 @@ Both modes satisfy the `ProtoSchema` protocol and are interchangeable in the Ser
         + [1.8.6 `CustomProtobufDeserializer` (`custom_protobuf_serdes.py`)](#186-kafkaprotobufdeserializer-custom_protobuf_serdespy)
         + [1.8.7 `kafka_helpers.py`](#187-kafka_helperspy)
         + [1.8.8 `utilities.py`](#188-utilitiespy)
-        + [1.8.9 `demos.py`](#189-demospy)
+        + [1.8.9 `examples.py`](#189-demospy)
     + [1.9 Logging](#19-logging)
     + [1.10 Wire format](#110-wire-format)
         - [1.10.1 Why a message index?](#1101-why-a-message-index)
         - [1.10.2 What the code does](#1102-what-the-code-does)
-+ [2.0 Running the demos](#20-running-the-demos)
-    + [2.1 Demos](#21-demos)
-        + [2.1.1 Demo 1 — Basic Serializer & Deserializer (`--demo basic`)](#211-demo-1--basic-serializer--deserializer---demo-basic)
-        + [2.1.2 Demo 2 — Reference-Deletion Protection (`--demo delete`)](#212-demo-2--reference-deletion-protection---demo-delete)
-        + [2.1.3 Demo 3 — Schema Evolution (`--demo evolution`)](#213-demo-3--schema-evolution---demo-evolution)
-        + [2.1.4 Demo 4 — Multiple Event Types / `oneOf` (`--demo oneof`)](#214-demo-4--multiple-event-types--oneof---demo-oneof)
-        + [2.1.5 Demo 5 — Null-Value Handling (`--demo null`)](#215-demo-5--null-value-handling---demo-null)
-        + [2.1.6 Demo 6 — Compatibility Rules (`--demo compat`)](#216-demo-6--compatibility-rules---demo-compat)
-        + [2.1.7 Demo 7 — Schema Types (`--demo types`)](#217-demo-7--schema-types--return-types---demo-types)
-        + [2.1.8 Demo 8 — Subject Name Strategies (`--demo strategies`)](#218-demo-8--subject-name-strategies---demo-strategies)
-        + [2.1.9 Demo 9 — Client-Side Field Level Encryption (`--demo csfle`)](#219-demo-9--client-side-field-level-encryption---demo-csfle)
-        + [2.1.10 Demo 10 — Manual Schema Registration (`--demo no-auto-register`)](#2110-demo-10--manual-schema-registration---demo-no-auto-register)
++ [2.0 Running the examples](#20-running-the-examples)
+    + [2.1 Examples](#21-examples)
+        + [2.1.1 Example 1 — Basic Serializer & Deserializer (`--example basic`)](#211-example-1--basic-serializer--deserializer---example-basic)
+        + [2.1.2 Example 2 — Reference-Deletion Protection (`--example delete`)](#212-example-2--reference-deletion-protection---example-delete)
+        + [2.1.3 Example 3 — Schema Evolution (`--example evolution`)](#213-example-3--schema-evolution---example-evolution)
+        + [2.1.4 Example 4 — Multiple Event Types / `oneOf` (`--example oneof`)](#214-example-4--multiple-event-types--oneof---example-oneof)
+        + [2.1.5 Example 5 — Null-Value Handling (`--example null`)](#215-example-5--null-value-handling---example-null)
+        + [2.1.6 Example 6 — Compatibility Rules (`--example compat`)](#216-example-6--compatibility-rules---example-compat)
+        + [2.1.7 Example 7 — Schema Types (`--example types`)](#217-example-7--schema-types--return-types---example-types)
+        + [2.1.8 Example 8 — Subject Name Strategies (`--example strategies`)](#218-example-8--subject-name-strategies---example-strategies)
+        + [2.1.9 Example 9 — Client-Side Field Level Encryption (`--example csfle`)](#219-example-9--client-side-field-level-encryption---example-csfle)
+        + [2.1.10 Example 10 — Manual Schema Registration (`--example no-auto-register`)](#2110-example-10--manual-schema-registration---example-no-auto-register)
 + [3.0 AWS KMS Provisioning](#30-aws-kms-provisioning)
     + [3.1 What it provisions](#31-what-it-provisions)
     + [3.2 How it is used](#32-how-it-is-used)
@@ -63,7 +63,7 @@ Both modes satisfy the `ProtoSchema` protocol and are interchangeable in the Ser
 ### **1.1 Project layout**
 
 ```
-cc-python-dynamic_precompiled-protobuf-example/
+cc-python-dynamic_precompiled-protobuf-examples/
 ├── src
 │   ├── constants.py                 # DEFAULT_TOOL_LOG_FILE, DEFAULT_TOOL_LOG_FORMAT
 │   ├── utilities.py                 # setup_logging(), get_config(), parse_args() — logging, env config, CLI
@@ -73,8 +73,8 @@ cc-python-dynamic_precompiled-protobuf-example/
 │   ├── compiled_protobuf_helpers.py # CompiledProtoMessage, compile_protos(), load_compiled_message() — protoc stubs
 │   ├── custom_protobuf_serdes.py    # CustomProtobufSerializer & CustomProtobufDeserializer
 │   ├── kafka_helpers.py             # ensure_topics(), kafka_produce(), kafka_consume_one()
-│   ├── demos.py                     # All ten demo functions (demo_basic … demo_no_auto_register)
-│   ├── main.py                      # Thin entry point — wires config, SR client, and demo dispatch
+│   ├── examples.py                     # All ten demo functions (example_basic … example_no_auto_register)
+│   ├── main.py                      # Thin entry point — wires config, SR client, and example dispatch
 │   ├── schemas                      # Proto3 schema definitions (used by --use-protoc)
 │   │   ├── MyRecord.proto           # Basic schema with import
 │   │   ├── other.proto              # Referenced schema (OtherRecord)
@@ -85,14 +85,14 @@ cc-python-dynamic_precompiled-protobuf-example/
 │   │   ├── Payment.proto            # Payment message (subject name strategies)
 │   │   ├── SensitiveRecord.proto    # CSFLE example with PII fields
 │   │   ├── ExampleMessage.proto     # General-purpose example
-│   │   ├── Invoice.proto            # Manual registration example (no-auto-register demo)
+│   │   ├── Invoice.proto            # Manual registration example (no-auto-register example)
 │   │   └── evolution
 │   │       ├── MyRecord_v1.proto    # Schema evolution v1 (id, amount)
 │   │       └── MyRecord_v2.proto    # Schema evolution v2 (+ customer_id)
 │   └── generated_pb2/               # Auto-generated protoc stubs (gitignored, created by --use-protoc)
 ├── docs
 │   └── images                       # Generated diagrams
-├── run-demo.sh                      # Shell script — authenticates via AWS SSO, provisions KMS via AWS CLI, and runs demos
+├── run-example.sh                      # Shell script — authenticates via AWS SSO, provisions KMS via AWS CLI, and runs examples
 ├── pyproject.toml                   # Project metadata, dependencies, logging
 ├── uv.lock                          # Pinned dependency lockfile — commit this
 ├── .env                             # Credentials — NOT COMMITTED, loaded automatically by python-dotenv at startup
@@ -130,7 +130,7 @@ flowchart TB
     %% ── CLI ────────────────────────────────────────────────────────────
     subgraph CLI["CLI  (main.py · utilities.py)"]
         direction LR
-        ARGS["parse_args()\n--mode  --demo  --run-id\n--save-schemas  --use-protoc"]
+        ARGS["parse_args()\n--mode  --example  --run-id\n--save-schemas  --use-protoc"]
         CFG["get_config()\nreads os.environ"]
         ARGS --> CFG
     end
@@ -248,23 +248,23 @@ flowchart TB
         BASE --> CONS_H
     end
 
-    %% ── Demos ───────────────────────────────────────────────────────────
-    subgraph DEMOS["Demo Sections  (demos.py)"]
+    %% ── Examples ───────────────────────────────────────────────────────────
+    subgraph DEMOS["Example Sections  (examples.py)"]
         direction LR
-        D1["Demo 1 · Basic\ntestproto-{run_id}"]
-        D2["Demo 2 · Delete Protection\nreferencedby → correct order"]
-        D3["Demo 3 · Schema Evolution\nBACKWARD_TRANSITIVE\ntransactions-proto-{run_id}"]
-        D4["Demo 4 · oneOf\nAllTypes wrapper\nall-events-{run_id}"]
-        D5["Demo 5 · Null Handling\noptional fields\nnullables-{run_id}"]
-        D6["Demo 6 · Compatibility\n7 modes reference table"]
-        D7["Demo 7 · Schema Types\nspecific vs DynamicMessage"]
-        D8["Demo 8 · Subject Strategies\npayments-{run_id}"]
-        D9["Demo 9 · CSFLE\nfield-level encryption\ncsfle-{run_id}"]
-        D10["Demo 10 · Manual Registration\nauto_register=False\ninvoices-{run_id}"]
+        D1["Example 1 · Basic\ntestproto-{run_id}"]
+        D2["Example 2 · Delete Protection\nreferencedby → correct order"]
+        D3["Example 3 · Schema Evolution\nBACKWARD_TRANSITIVE\ntransactions-proto-{run_id}"]
+        D4["Example 4 · oneOf\nAllTypes wrapper\nall-events-{run_id}"]
+        D5["Example 5 · Null Handling\noptional fields\nnullables-{run_id}"]
+        D6["Example 6 · Compatibility\n7 modes reference table"]
+        D7["Example 7 · Schema Types\nspecific vs DynamicMessage"]
+        D8["Example 8 · Subject Strategies\npayments-{run_id}"]
+        D9["Example 9 · CSFLE\nfield-level encryption\ncsfle-{run_id}"]
+        D10["Example 10 · Manual Registration\nauto_register=False\ninvoices-{run_id}"]
     end
 
-    %% ── AWS CLI (run-demo.sh) ─────────────────────────────────────────
-    subgraph AWSCLI["AWS CLI  (run-demo.sh)"]
+    %% ── AWS CLI (run-example.sh) ─────────────────────────────────────────
+    subgraph AWSCLI["AWS CLI  (run-example.sh)"]
         direction TB
         CLI_ID["aws sts get-caller-identity\naccount ID · caller ARN"]
         CLI_KEY["aws kms create-key\ndescription · policy · tags"]
@@ -369,8 +369,8 @@ Curious to learn more about [Astral](https://astral.sh/)'s `uv`? Check these out
 ### **1.4 Setup**
 
 ```bash
-git clone https://github.com/j3-signalroom/cc-python-dynamic_precompiled-protobuf-example
-cd cc-python-dynamic_precompiled-protobuf-example
+git clone https://github.com/j3-signalroom/cc-python-dynamic_precompiled-protobuf-examples
+cd cc-python-dynamic_precompiled-protobuf-examples
 
 # Create .venv and install exact pinned versions from uv.lock
 uv sync
@@ -385,10 +385,10 @@ into a local `.venv`. No manual `pip install` is needed.
 |---|---|---|
 | `attrs` | 25.4.0 | Data class utilities |
 | `authlib` | 1.6.9 | Authentication library |
-| `aws2-wrap` | 1.4.0 | AWS SSO credential wrapper used by `run-demo.sh` |
+| `aws2-wrap` | 1.4.0 | AWS SSO credential wrapper used by `run-example.sh` |
 | `boto3` | 1.38.0 | AWS KMS client for CSFLE DEK unwrapping |
 | `cachetools` | 7.0.5 | In-process caching utilities |
-| `confluent-kafka[schemaregistry,protobuf]` | 2.13.2 | Producer, Consumer, AdminClient, Schema Registry, Protobuf SerDes (required for `--mode full` and `--demo csfle`) |
+| `confluent-kafka[schemaregistry,protobuf]` | 2.13.2 | Producer, Consumer, AdminClient, Schema Registry, Protobuf SerDes (required for `--mode full` and `--example csfle`) |
 | `dotenv` | 0.9.9 | dotenv compatibility shim |
 | `googleapis-common-protos` | 1.56.1 | Common proto definitions (well-known types) |
 | `httpx` | 0.28.1 | Async HTTP client |
@@ -404,7 +404,7 @@ into a local `.venv`. No manual `pip install` is needed.
 
 ### **1.6 Configuration**
 
-> **Do not create `.env` manually.** The `run-demo.sh` script generates it automatically from the command-line arguments you supply (see [2.0 Running the demos](#20-running-the-demos)). This ensures credentials are wired correctly and AWS KMS provisioning is handled before the Python entry point starts.
+> **Do not create `.env` manually.** The `run-example.sh` script generates it automatically from the command-line arguments you supply (see [2.0 Running the examples](#20-running-the-examples)). This ensures credentials are wired correctly and AWS KMS provisioning is handled before the Python entry point starts.
 
 The generated `.env` file (never committed) contains:
 
@@ -419,7 +419,7 @@ SCHEMA_REGISTRY_URL="..."
 SR_API_KEY="..."
 SR_API_SECRET="..."
 
-# AWS KMS — auto-populated by run-demo.sh when --demo csfle or --demo all
+# AWS KMS — auto-populated by run-example.sh when --example csfle or --example all
 AWS_KMS_KEY_ARN="..."
 ```
 
@@ -434,8 +434,8 @@ no `--env-file` flag is needed.
 | SR API key | `DeveloperRead` + `DeveloperWrite` on Schema Registry |
 | Kafka cluster | Any type — Basic, Standard, Dedicated, or Enterprise |
 | Kafka API key | `DeveloperRead` + `DeveloperWrite` on the cluster |
-| AWS KMS key | Symmetric encrypt/decrypt key — required for `--demo csfle` |
-| AWS credentials | `boto3`-compatible auth (env vars, `~/.aws/credentials`, IAM role, or AWS SSO — see `run-demo.sh`) |
+| AWS KMS key | Symmetric encrypt/decrypt key — required for `--example csfle` |
+| AWS credentials | `boto3`-compatible auth (env vars, `~/.aws/credentials`, IAM role, or AWS SSO — see `run-example.sh`) |
 
 ---
 
@@ -444,7 +444,7 @@ no `--env-file` flag is needed.
 #### **1.8.1 `SchemaRegistryClient` (`schema_registry_client.py`)**
 
 A `requests.Session`-based REST client covering the full SR API surface used
-by the demos. Authenticates with HTTP Basic (SR API key/secret). Maintains an
+by the examples. Authenticates with HTTP Basic (SR API key/secret). Maintains an
 in-process `_cache: dict[int, dict]` keyed by schema ID to avoid redundant
 `GET /schemas/ids/{id}` round-trips. Also includes the `_read_varint()` helper
 used by `decode_header()` to skip the message-index varint array.
@@ -542,7 +542,7 @@ type safety.
 
 > **Note:** Precompiled mode uses the global `descriptor_pool`, so it cannot load two versions
 > of the same message name simultaneously (unlike the dynamic per-instance pool approach).
-> This makes it unsuitable for schema-evolution demos that register multiple versions.
+> This makes it unsuitable for schema-evolution examples that register multiple versions.
 
 #### **1.8.5 `CustomProtobufSerializer` (`custom_protobuf_serdes.py`)**
 
@@ -563,7 +563,7 @@ populated by the serializer (DynamicMessage equivalent).
 
 #### **1.8.7 `kafka_helpers.py`**
 
-Contains all Kafka broker interaction logic, isolated from the demo and
+Contains all Kafka broker interaction logic, isolated from the example and
 Schema Registry code. Only used when running with `--mode full`.
 
 | Function | Purpose |
@@ -579,31 +579,31 @@ Schema Registry code. Only used when running with `--mode full`.
 |---|---|
 | `setup_logging(log_file?)` | Reads `[tool.logging]` from `pyproject.toml` via `tomllib` and applies it with `logging.config.dictConfig()`. Falls back to a basic dual-handler setup (file + console) if the config is absent. Returns the root logger. |
 | `get_config()` | Reads the seven environment variables (`BOOTSTRAP_SERVERS`, `KAFKA_API_KEY`, …, `AWS_KMS_KEY_ARN`) and returns `(cfg_dict, missing_keys)`. |
-| `parse_args()` | Defines the `--mode`, `--demo`, `--run-id`, `--save-schemas`, and `--use-protoc` CLI flags via `argparse` and returns the parsed `Namespace`. |
+| `parse_args()` | Defines the `--mode`, `--example`, `--run-id`, `--save-schemas`, and `--use-protoc` CLI flags via `argparse` and returns the parsed `Namespace`. |
 
-#### **1.8.9 `demos.py`**
+#### **1.8.9 `examples.py`**
 
-Contains all ten demo functions extracted from the former monolithic `main.py`.
+Contains all ten example functions extracted from the former monolithic `main.py`.
 Each function receives a `SchemaRegistryClient`, an optional Kafka config dict
 (for `--mode full`), the `run_id` suffix, an optional `save_dir` path, and a
-`use_protoc` flag. When `use_protoc` is `True`, demos use `load_compiled_message()`
+`use_protoc` flag. When `use_protoc` is `True`, examples use `load_compiled_message()`
 to load protoc-compiled stubs instead of building schemas dynamically. When
-`save_dir` is set (via `--save-schemas`), each demo writes its `.proto` schema
+`save_dir` is set (via `--save-schemas`), each example writes its `.proto` schema
 files to the specified directory. The module has its own logger via
 `setup_logging()`.
 
-| Function | Demo |
+| Function | Example |
 |---|---|
-| `demo_basic()` | 1 — Basic Serializer & Deserializer |
-| `demo_delete_protection()` | 2 — Reference-Deletion Protection |
-| `demo_evolution()` | 3 — Schema Evolution |
-| `demo_oneof()` | 4 — Multiple Event Types / `oneOf` |
-| `demo_null_handling()` | 5 — Null-Value Handling |
-| `demo_compatibility()` | 6 — Compatibility Rules |
-| `demo_types()` | 7 — Schema Types |
-| `demo_strategies()` | 8 — Subject Name Strategies |
-| `demo_csfle()` | 9 — Client-Side Field Level Encryption |
-| `demo_no_auto_register()` | 10 — Manual Schema Registration (`auto_register=False`) |
+| `example_basic()` | 1 — Basic Serializer & Deserializer |
+| `example_delete_protection()` | 2 — Reference-Deletion Protection |
+| `example_evolution()` | 3 — Schema Evolution |
+| `example_oneof()` | 4 — Multiple Event Types / `oneOf` |
+| `example_null_handling()` | 5 — Null-Value Handling |
+| `example_compatibility()` | 6 — Compatibility Rules |
+| `example_types()` | 7 — Schema Types |
+| `example_strategies()` | 8 — Subject Name Strategies |
+| `example_csfle()` | 9 — Client-Side Field Level Encryption |
+| `example_no_auto_register()` | 10 — Manual Schema Registration (`auto_register=False`) |
 
 ---
 
@@ -615,7 +615,7 @@ by `utilities.setup_logging()`:
 | Handler | Level | Output |
 |---|---|---|
 | `console` | `DEBUG` | stdout |
-| `file` | `INFO` | `cc-python-dynamic_precompiled-protobuf-example.log` (overwritten each run, mode `w`) |
+| `file` | `INFO` | `cc-python-dynamic_precompiled-protobuf-examples.log` (overwritten each run, mode `w`) |
 
 Log format: `YYYY-MM-DD HH:MM:SS - LEVEL - function_name - message`
 
@@ -676,13 +676,13 @@ This envelope is what makes Schema Registry-aware consumers (in any language) ab
 
 ---
 
-## **2.0 Running the demos**
+## **2.0 Running the examples**
 
-> **Always use `run-demo.sh`** — it is the only supported way to run the demos. The script validates arguments, authenticates to AWS SSO (when needed), provisions the KMS KEK for the CSFLE demo, generates the `.env` file, and then invokes `uv run python src/main.py` with the correct flags. Do not run `src/main.py` directly.
+> **Always use `run-example.sh`** — it is the only supported way to run the examples. The script validates arguments, authenticates to AWS SSO (when needed), provisions the KMS KEK for the CSFLE example, generates the `.env` file, and then invokes `uv run python src/main.py` with the correct flags. Do not run `src/main.py` directly.
 
 ```bash
-./run-demo.sh --mode=<schema-only|full> \
-              --demo=<all|basic|delete|evolution|oneof|null|compat|types|strategies|csfle|no-auto-register> \
+./run-example.sh --mode=<schema-only|full> \
+              --example=<all|basic|delete|evolution|oneof|null|compat|types|strategies|csfle|no-auto-register> \
               --schema-registry-url=<SCHEMA_REGISTRY_URL> \
               --sr-api-key=<SR_API_KEY> \
               --sr-api-secret=<SR_API_SECRET> \
@@ -698,14 +698,14 @@ This envelope is what makes Schema Registry-aware consumers (in any language) ab
 | Argument | Required | Choice / Value | Default | Description |
 |----------|----------|-------------|---------|-------------|
 | `--mode` | ✅ | `schema-only`, `full` | — | SR-only or full Kafka round-trip |
-| `--demo` | ✅ | `all` `basic` `delete` `evolution` `oneof` `null` `compat` `types` `strategies` `csfle` `no-auto-register` | — | Which demo to run |
+| `--example` | ✅ | `all` `basic` `delete` `evolution` `oneof` `null` `compat` `types` `strategies` `csfle` `no-auto-register` | — | Which example to run |
 | `--schema-registry-url` | ✅ | URL | — | Confluent Cloud Schema Registry endpoint |
 | `--sr-api-key` | ✅ | string | — | Schema Registry API key |
 | `--sr-api-secret` | ✅ | string | — | Schema Registry API secret |
 | `--bootstrap-servers` | ❌ | host:port | — | Kafka bootstrap servers (required for `--mode full`) |
 | `--kafka-api-key` | ❌ | string | — | Kafka API key (required for `--mode full`) |
 | `--kafka-api-secret` | ❌ | string | — | Kafka API secret (required for `--mode full`) |
-| `--profile` | ❌ | string | — | The AWS SSO profile name. Passed directly to `aws sso login` and `aws2-wrap` for authentication, and used to resolve `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `AWS_SESSION_TOKEN` for AWS CLI calls. Required for `--demo csfle`. |
+| `--profile` | ❌ | string | — | The AWS SSO profile name. Passed directly to `aws sso login` and `aws2-wrap` for authentication, and used to resolve `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `AWS_SESSION_TOKEN` for AWS CLI calls. Required for `--example csfle`. |
 | `--run-id` | ❌ | any string | random 8-char UUID prefix | Appended to every topic and subject name to prevent collisions across runs |
 | `--save-schemas` | ❌ | directory path | disabled | Save generated `.proto` schema files to the given directory (created if needed) |
 | `--use-protoc` | ❌ | flag (no value) | disabled | Use protoc-compiled `_pb2.py` stubs instead of dynamic runtime descriptors. Requires `protoc` on `PATH` (`brew install protobuf`). |
@@ -716,9 +716,9 @@ In `--mode=full`, the app calls `ensure_topics()` via `AdminClient` to pre-creat
 
 ---
 
-### **2.1 Demos**
+### **2.1 Examples**
 
-#### **2.1.1 Demo 1 — Basic Serializer & Deserializer (`--demo basic`)**
+#### **2.1.1 Example 1 — Basic Serializer & Deserializer (`--example basic`)**
 
 Builds two `ProtoMessage` objects (`OtherRecord` and `MyRecord`), registers
 them in dependency order (referenced schema first), and serializes a message
@@ -730,14 +730,14 @@ consumed from Kafka.
 **Topics:** `testproto-{run_id}`  
 **Subjects:** `other-{run_id}.proto`, `testproto-{run_id}-value`
 
-#### **2.1.2 Demo 2 — Reference-Deletion Protection (`--demo delete`)**
+#### **2.1.2 Example 2 — Reference-Deletion Protection (`--example delete`)**
 
 Demonstrates that Schema Registry rejects deletion of a schema that is
 referenced by another. Calls `referenced_by()` to show the dependency graph,
 attempts to delete the leaf subject (expects a `RuntimeError`), then shows the
 correct order: delete the referencing subject first, then the referenced one.
 
-#### **2.1.3 Demo 3 — Schema Evolution (`--demo evolution`)**
+#### **2.1.3 Example 3 — Schema Evolution (`--example evolution`)**
 
 Registers a v1 `MyRecord` schema (`id`, `amount`), sets `BACKWARD_TRANSITIVE`
 compatibility on the subject via `PUT /config/{subject}`, then registers v2
@@ -748,7 +748,7 @@ the same topic and consumes them.
 **Topics:** `transactions-proto-{run_id}`  
 **Subjects:** `transactions-proto-{run_id}-value`
 
-#### **2.1.4 Demo 4 — Multiple Event Types / `oneOf` (`--demo oneof`)**
+#### **2.1.4 Example 4 — Multiple Event Types / `oneOf` (`--example oneof`)**
 
 Builds four schemas: `Customer`, `Product`, `Order`, and an `AllTypes` wrapper
 that holds all three under a `oneof oneof_type` field. Registers all four with
@@ -759,20 +759,20 @@ cross-schema references, then serializes and routes three heterogeneous events
 **Subjects:** `Customer-{run_id}.proto`, `Product-{run_id}.proto`,
 `Order-{run_id}.proto`, `all-events-{run_id}-value`
 
-#### **2.1.5 Demo 5 — Null-Value Handling (`--demo null`)**
+#### **2.1.5 Example 5 — Null-Value Handling (`--example null`)**
 
 Shows the recommended proto3 approach for nullable fields using the `optional` keyword on `ProtoField`. Serializes a partial record (name only) and a full record, then deserializes both. Also prints the pre-proto3 `google.protobuf.StringValue` wrapper alternative used with Confluent Connect's `wrapper.for.nullable=true` flag.
 
 **Topics:** `nullables-{run_id}`
 
-#### **2.1.6 Demo 6 — Compatibility Rules (`--demo compat`)**
+#### **2.1.6 Example 6 — Compatibility Rules (`--example compat`)**
 
 Fetches the SR global compatibility level via `GET /config` and prints a
 reference table of all seven modes. Highlights the key Protobuf-vs-Avro
 distinction: adding a new *message type* (not just a field) breaks FORWARD
 compatibility, making `BACKWARD_TRANSITIVE` the recommended default.
 
-#### **2.1.7 Demo 7 — Schema Types & Return Types (`--demo types`)**
+#### **2.1.7 Example 7 — Schema Types & Return Types (`--example types`)**
 
 Calls `GET /schemas/types` to list which schema types your SR instance
 supports, then prints a reference table mapping Avro / Protobuf / JSON Schema
@@ -780,7 +780,7 @@ to their specific and generic Python return types. Documents the Python
 equivalents of the Java `specific.protobuf.value.type` and `derive.type`
 config properties.
 
-#### **2.1.8 Demo 8 — Subject Name Strategies (`--demo strategies`)**
+#### **2.1.8 Example 8 — Subject Name Strategies (`--example strategies`)**
 
 Registers the same `Payment` schema under all three subject name strategies
 and prints the resulting subject name for each. Also documents both reference
@@ -794,14 +794,14 @@ subject name strategies.
 | `DefaultReferenceSubjectNameStrategy` | import path, e.g. `other.proto` |
 | `QualifiedReferenceSubjectNameStrategy` | dotted form, e.g. `mypackage.myfile` |
 
-#### **2.1.9 Demo 9 — Client-Side Field Level Encryption (`--demo csfle`)**
+#### **2.1.9 Example 9 — Client-Side Field Level Encryption (`--example csfle`)**
 
 Demonstrates Confluent-native CSFLE using the **`confluent-kafka`** library's
 `ProtobufSerializer` / `ProtobufDeserializer` with the `FieldEncryptionExecutor`
 rule engine and `AwsKmsDriver`. Encryption/decryption is handled transparently
 by the Confluent serializer/deserializer.
 
-The demo proceeds in eleven steps:
+The example proceeds in eleven steps:
 
 1. **Register drivers** — `AwsKmsDriver.register()` + `FieldEncryptionExecutor.register()`
 2. **Build schema** — a `SensitiveRecord` with `ssn` and `email` fields tagged `PII` via `ProtoField(tags="PII")`
@@ -816,15 +816,15 @@ The demo proceeds in eleven steps:
 11. **Architecture notes** — printed to log showing the full CSFLE flow
 
 Requires `AWS_KMS_KEY_ARN` and valid AWS credentials (`boto3`-compatible:
-env vars, `~/.aws/credentials`, IAM role, or AWS SSO via `run-demo.sh`).
+env vars, `~/.aws/credentials`, IAM role, or AWS SSO via `run-example.sh`).
 
 **Topics:** `csfle-{run_id}`
 **Subjects:** `csfle-{run_id}-value`
 
-#### **2.1.10 Demo 10 — Manual Schema Registration (`--demo no-auto-register`)**
+#### **2.1.10 Example 10 — Manual Schema Registration (`--example no-auto-register`)**
 
 Demonstrates the `auto_register=False` serializer mode, where schemas must be
-pre-registered before any produce calls. The demo walks through three steps:
+pre-registered before any produce calls. The example walks through three steps:
 
 1. **Step 1** — Manually registers an `Invoice` schema under `invoices-{run_id}-value`
    via `sr.register()` and prints the returned `schema_id`.
@@ -835,7 +835,7 @@ pre-registered before any produce calls. The demo walks through three steps:
    to produce to an *unregistered* subject (`unknown-{run_id}`), proving that
    `auto_register=False` enforces strict governance.
 
-The demo closes with a reference box explaining when to use `auto_register=False`
+The example closes with a reference box explaining when to use `auto_register=False`
 in production (CI/CD-managed schemas, read-only producer credentials, strict
 schema governance).
 
@@ -846,7 +846,7 @@ schema governance).
 
 ## **3.0 AWS KMS Provisioning**
 
-The `run-demo.sh` script provisions the AWS KMS key used as the Key Encryption Key (KEK) for the CSFLE demo using **AWS CLI** commands directly.
+The `run-example.sh` script provisions the AWS KMS key used as the Key Encryption Key (KEK) for the CSFLE example using **AWS CLI** commands directly.
 
 ### **3.1 What it provisions**
 
@@ -857,7 +857,7 @@ The `run-demo.sh` script provisions the AWS KMS key used as the Key Encryption K
 
 ### **3.2 How it is used**
 
-When `run-demo.sh` is invoked with `--demo=csfle` or `--demo=all`, the script automatically:
+When `run-example.sh` is invoked with `--example=csfle` or `--example=all`, the script automatically:
 
 1. Deletes any existing `alias/confluent-csfle-kek` alias from a previous run
 2. Authenticates to AWS SSO (if `--profile` is provided)

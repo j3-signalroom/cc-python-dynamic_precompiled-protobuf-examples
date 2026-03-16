@@ -90,7 +90,7 @@ def parse_args() -> argparse.Namespace:
             flags:
               Required:
                 --mode=<MODE>               Run mode: "schema-only" or "full" (default: schema-only)
-                --demo=<DEMO>               Demo to run: all, basic, delete, evolution, oneof,
+                --example=<EXAMPLE>         Example to run: all, basic, delete, evolution, oneof,
                                             null, compat, types, strategies, csfle,
                                             no-auto-register (default: all)
                 --schema-registry-url=<URL> Confluent Schema Registry endpoint URL
@@ -102,7 +102,7 @@ def parse_args() -> argparse.Namespace:
                 --kafka-api-key=<KEY>          Kafka cluster API key
                 --kafka-api-secret=<SECRET>    Kafka cluster API secret
 
-              Required for --demo=csfle or --demo=all:
+              Required for --example=csfle or --example=all:
                 --profile=<AWS_SSO_PROFILE> AWS SSO profile for KMS key provisioning
 
               Optional:
@@ -115,36 +115,36 @@ def parse_args() -> argparse.Namespace:
 
             examples:
               Quick start (schema-only):
-                ./run-demo.sh --mode=schema-only --demo=all \\
+                ./run-example.sh --mode=schema-only --example=all \\
                   --profile=<AWS_SSO_PROFILE> --schema-registry-url=<URL> \\
                   --sr-api-key=<KEY> --sr-api-secret=<SECRET>
 
               With Kafka:
-                ./run-demo.sh --mode=full --demo=all \\
+                ./run-example.sh --mode=full --example=all \\
                   --profile=<AWS_SSO_PROFILE> --schema-registry-url=<URL> \\
                   --sr-api-key=<KEY> --sr-api-secret=<SECRET> \\
                   --bootstrap-servers=<SERVERS> --kafka-api-key=<KEY> \\
                   --kafka-api-secret=<SECRET>
 
-              Single demo:
-                ./run-demo.sh --mode=schema-only --demo=evolution \\
+              Single example:
+                ./run-example.sh --mode=schema-only --example=evolution \\
                   --profile=<AWS_SSO_PROFILE> --schema-registry-url=<URL> \\
                   --sr-api-key=<KEY> --sr-api-secret=<SECRET>
 
               Save .proto schemas to disk:
-                ./run-demo.sh --mode=schema-only --demo=all --save-schemas=./schemas \\
+                ./run-example.sh --mode=schema-only --example=all --save-schemas=./schemas \\
                   --profile=<AWS_SSO_PROFILE> --schema-registry-url=<URL> \\
                   --sr-api-key=<KEY> --sr-api-secret=<SECRET>
 
               Use precompiled Protobuf stubs:
-                ./run-demo.sh --mode=schema-only --demo=basic --use-protoc \\
+                ./run-example.sh --mode=schema-only --example=basic --use-protoc \\
                   --schema-registry-url=<URL> --sr-api-key=<KEY> \\
                   --sr-api-secret=<SECRET>
         """),
     )
     p.add_argument("--mode", choices=["schema-only", "full"], default="schema-only")
     p.add_argument(
-        "--demo",
+        "--example",
         choices=["all", "basic", "delete", "evolution", "oneof",
                  "null", "compat", "types", "strategies", "csfle",
                  "no-auto-register"],

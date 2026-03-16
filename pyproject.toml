@@ -1,7 +1,7 @@
 [project]
-name = "cc-python-dynamic_precompiled-protobuf-example"
-version = "0.06.00.00"
-description = "Confluent Cloud Python Dynamic or Precompiled Protobuf Example"
+name = "cc-python-dynamic_precompiled-protobuf-examples"
+version = "0.07.00.00"
+description = "Confluent Cloud Python Dynamic or Precompiled Protobuf Examples"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -34,7 +34,7 @@ datefmt = "%Y-%m-%d %H:%M:%S"
 
 [tool.logging.handlers.file]
 class = "logging.FileHandler"
-filename = "cc-python-dynamic_precompiled-protobuf-example.log"
+filename = "cc-python-dynamic_precompiled-protobuf-examples.log"
 formatter = "default"
 level = "INFO"
 mode = "w"

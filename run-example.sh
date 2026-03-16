@@ -5,8 +5,8 @@
 # Run a specific demo script for the project using the specified AWS SSO profile.
 #
 # *** Script Syntax ***
-# ./run-demo.sh --mode=<MODE>
-#               --demo=<DEMO>
+# ./run-example.sh --mode=<MODE>
+#               --example=<EXAMPLE>
 #               --schema-registry-url=<SCHEMA_REGISTRY_URL>
 #               --sr-api-key=<SR_API_KEY>
 #               --sr-api-secret=<SR_API_SECRET>
@@ -50,13 +50,13 @@ print_step() {
 # Configuration folders
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-argument_list="--mode=<MODE> --demo=<DEMO> --schema-registry-url=<SCHEMA_REGISTRY_URL> --sr-api-key=<SR_API_KEY> --sr-api-secret=<SR_API_SECRET>"
+argument_list="--mode=<MODE> --example=<EXAMPLE> --schema-registry-url=<SCHEMA_REGISTRY_URL> --sr-api-key=<SR_API_KEY> --sr-api-secret=<SR_API_SECRET>"
 
 
 # Default required variables
 AWS_PROFILE=""
 mode=""
-demo=""
+example=""
 run_id=""
 save_schemas_dir=""
 use_protoc=""
@@ -79,9 +79,9 @@ do
         *"--mode="*)
             arg_length=7
             mode=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
-        *"--demo="*)
-            arg_length=7
-            demo=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
+        *"--example="*)
+            arg_length=10
+            example=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
         *"--run-id="*)
             arg_length=9
             run_id=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
@@ -133,11 +133,11 @@ then
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
 
-# Check required --demo argument was supplied
-if [ -z "$demo" ]
+# Check required --example argument was supplied
+if [ -z "$example" ]
 then
     echo
-    print_error "(Error Message 006)  You did not include the proper use of the --demo=<DEMO> argument in the call."
+    print_error "(Error Message 006)  You did not include the proper use of the --example=<EXAMPLE> argument in the call."
     echo
     print_error "Usage:  Require five argument ---> `basename $0` $argument_list"
     echo
@@ -178,7 +178,7 @@ then
 fi
 
 # Check required AWS_PROFILE environment variable was supplied
-if [ "$demo" = "csfle" ] || [ "$demo" = "all" ]; then
+if [ "$example" = "csfle" ] || [ "$example" = "all" ]; then
     if [ -z "$AWS_PROFILE" ]
     then            
         echo
@@ -206,7 +206,7 @@ then
 fi
 
 # ── Provision the KMS KEK when CSFLE demo is selected ─────────────────────
-if [ "$demo" = "csfle" ] || [ "$demo" = "all" ]; then
+if [ "$example" = "csfle" ] || [ "$example" = "all" ]; then
     # Clean up any existing KMS resources from previous runs to ensure a clean slate for the demo
     aws kms delete-alias --alias-name alias/confluent-csfle-kek --region "$AWS_REGION" 2>/dev/null \
         || print_warn "KMS alias not found, skipping deletion"
@@ -287,7 +287,7 @@ printf "BOOTSTRAP_SERVERS=\"${bootstrap_servers}\"\
 \nAWS_KMS_KEY_ARN=\"${aws_kms_key_arn}\"" > .env
 
 # Build the argument list for the demo script
-cmd_args="--mode $mode --demo $demo"
+cmd_args="--mode $mode --example $example"
 [ -n "$run_id" ] && cmd_args="$cmd_args --run-id $run_id"
 [ -n "$save_schemas_dir" ] && cmd_args="$cmd_args --save-schemas $save_schemas_dir"
 [ -n "$use_protoc" ] && cmd_args="$cmd_args --use-protoc"

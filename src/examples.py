@@ -28,8 +28,8 @@ def section(title: str) -> None:
     logger.info(f"\n{separator}\n  {title}\n{separator}")
 
 
-# ── Demo 1 ─────────────────────────────────────────────────────────────────
-def demo_basic(sr: SchemaRegistryClient, kafka_cfg: dict | None, run_id: str, save_dir: str = "", use_protoc: bool = False) -> None:
+# ── Example 1 ─────────────────────────────────────────────────────────────────
+def example_basic(sr: SchemaRegistryClient, kafka_cfg: dict | None, run_id: str, save_dir: str = "", use_protoc: bool = False) -> None:
     section("1 · Basic Protobuf Serializer & Deserializer")
 
     if use_protoc:
@@ -100,8 +100,8 @@ def demo_basic(sr: SchemaRegistryClient, kafka_cfg: dict | None, run_id: str, sa
     logger.info(json.dumps(vs, indent=2))
 
 
-# ── Demo 2 ─────────────────────────────────────────────────────────────────
-def demo_delete_protection(sr: SchemaRegistryClient, run_id: str) -> None:
+# ── Example 2 ─────────────────────────────────────────────────────────────────
+def example_delete_protection(sr: SchemaRegistryClient, run_id: str) -> None:
     section("2 · Reference-Deletion Protection")
 
     ref_subj = f"other-{run_id}.proto"
@@ -140,8 +140,8 @@ def demo_delete_protection(sr: SchemaRegistryClient, run_id: str) -> None:
         logger.info(f"  ✗ Failed: {exc}")
 
 
-# ── Demo 3 ─────────────────────────────────────────────────────────────────
-def demo_evolution(sr: SchemaRegistryClient, kafka_cfg: dict | None, run_id: str, save_dir: str = "", use_protoc: bool = False) -> None:
+# ── Example 3 ─────────────────────────────────────────────────────────────────
+def example_evolution(sr: SchemaRegistryClient, kafka_cfg: dict | None, run_id: str, save_dir: str = "", use_protoc: bool = False) -> None:
     section("3 · Schema Evolution (Backward Compatibility)")
 
     subject = f"transactions-proto-{run_id}-value"
@@ -224,8 +224,8 @@ def demo_evolution(sr: SchemaRegistryClient, kafka_cfg: dict | None, run_id: str
         logger.info(f"  Could not list: {exc}")
 
 
-# ── Demo 4 ─────────────────────────────────────────────────────────────────
-def demo_oneof(sr: SchemaRegistryClient, kafka_cfg: dict | None, run_id: str, save_dir: str = "", use_protoc: bool = False) -> None:
+# ── Example 4 ─────────────────────────────────────────────────────────────────
+def example_oneof(sr: SchemaRegistryClient, kafka_cfg: dict | None, run_id: str, save_dir: str = "", use_protoc: bool = False) -> None:
     section("4 · Multiple Event Types in the Same Topic (oneOf)")
 
     if use_protoc:
@@ -329,8 +329,8 @@ def demo_oneof(sr: SchemaRegistryClient, kafka_cfg: dict | None, run_id: str, sa
             logger.info(f"  [{next(iter(d)):8s}] → {d}")
 
 
-# ── Demo 5 ─────────────────────────────────────────────────────────────────
-def demo_null_handling(sr: SchemaRegistryClient, run_id: str, save_dir: str = "", use_protoc: bool = False) -> None:
+# ── Example 5 ─────────────────────────────────────────────────────────────────
+def example_null_handling(sr: SchemaRegistryClient, run_id: str, save_dir: str = "", use_protoc: bool = False) -> None:
     section("5 · Null-Value Handling with Optional Fields (recommended)")
 
     if use_protoc:
@@ -376,8 +376,8 @@ def demo_null_handling(sr: SchemaRegistryClient, run_id: str, save_dir: str = ""
     """), "  "))
 
 
-# ── Demo 6 ─────────────────────────────────────────────────────────────────
-def demo_compatibility(sr: SchemaRegistryClient) -> None:
+# ── Example 6 ─────────────────────────────────────────────────────────────────
+def example_compatibility(sr: SchemaRegistryClient) -> None:
     section("6 · Schema Compatibility Rules")
 
     try:
@@ -407,8 +407,8 @@ def demo_compatibility(sr: SchemaRegistryClient) -> None:
   └────────────────────────────────────────────────────────────────────┘""")
 
 
-# ── Demo 7 ─────────────────────────────────────────────────────────────────
-def demo_types(sr: SchemaRegistryClient) -> None:
+# ── Example 7 ─────────────────────────────────────────────────────────────────
+def example_types(sr: SchemaRegistryClient) -> None:
     section("7 · Supported Schema Types & Specific vs Generic Return Types")
 
     try:
@@ -435,8 +435,8 @@ def demo_types(sr: SchemaRegistryClient) -> None:
 """)
 
 
-# ── Demo 8 ─────────────────────────────────────────────────────────────────
-def demo_strategies(sr: SchemaRegistryClient, run_id: str, save_dir: str = "", use_protoc: bool = False) -> None:
+# ── Example 8 ─────────────────────────────────────────────────────────────────
+def example_strategies(sr: SchemaRegistryClient, run_id: str, save_dir: str = "", use_protoc: bool = False) -> None:
     section("8 · Subject Name Strategies")
 
     if use_protoc:
@@ -471,8 +471,8 @@ def demo_strategies(sr: SchemaRegistryClient, run_id: str, save_dir: str = "", u
 """)
 
 
-# ── Demo 9 ─────────────────────────────────────────────────────────────────
-def demo_csfle(sr: SchemaRegistryClient, kafka_cfg: dict | None, run_id: str, aws_kms_key_arn: str, save_dir: str = "", use_protoc: bool = False) -> None:
+# ── Example 9 ─────────────────────────────────────────────────────────────────
+def example_csfle(sr: SchemaRegistryClient, kafka_cfg: dict | None, run_id: str, aws_kms_key_arn: str, save_dir: str = "", use_protoc: bool = False) -> None:
     section("9 · Client-Side Field Level Encryption (CSFLE) — Confluent Native")
 
     import os
@@ -624,8 +624,8 @@ def demo_csfle(sr: SchemaRegistryClient, kafka_cfg: dict | None, run_id: str, aw
   └────────────────────────────────────────────────────────────────────┘""")
 
 
-# ── Demo 10 ────────────────────────────────────────────────────────────────
-def demo_no_auto_register(sr: SchemaRegistryClient, kafka_cfg: dict | None, run_id: str, save_dir: str = "", use_protoc: bool = False) -> None:
+# ── Example 10 ────────────────────────────────────────────────────────────────
+def example_no_auto_register(sr: SchemaRegistryClient, kafka_cfg: dict | None, run_id: str, save_dir: str = "", use_protoc: bool = False) -> None:
     section("10 · Manual Schema Registration (auto_register=False)")
 
     if use_protoc:

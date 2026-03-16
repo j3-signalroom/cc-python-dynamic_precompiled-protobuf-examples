@@ -5,17 +5,17 @@ from dotenv import load_dotenv
 from utilities import setup_logging, get_config, parse_args
 from schema_registry_client import SchemaRegistryClient
 from kafka_helpers import ensure_topics
-from demos import (
-    demo_basic,
-    demo_delete_protection,
-    demo_evolution,
-    demo_oneof,
-    demo_null_handling,
-    demo_compatibility,
-    demo_types,
-    demo_strategies,
-    demo_csfle,
-    demo_no_auto_register,
+from examples import (
+    example_basic,
+    example_delete_protection,
+    example_evolution,
+    example_oneof,
+    example_null_handling,
+    example_compatibility,
+    example_types,
+    example_strategies,
+    example_csfle,
+    example_no_auto_register,
 )
 
 
@@ -56,7 +56,7 @@ def main() -> None:
             logger.error(f"  export {m}=<value>")
         sys.exit(1)
 
-    csfle_needed = args.demo in ("all", "csfle")
+    csfle_needed = args.example in ("all", "csfle")
     if csfle_needed and "AWS_KMS_KEY_ARN" in missing:
         logger.error("ERROR: CSFLE demo requires AWS KMS key ARN:")
         logger.error("  export AWS_KMS_KEY_ARN=arn:aws:kms:region:acct:key/key-id")
@@ -99,37 +99,37 @@ def main() -> None:
         logger.info("\n[Admin] Ensuring topics exist …")
         ensure_topics(kafka_cfg, required_topics)
 
-    run_all = args.demo == "all"
+    run_all = args.example == "all"
 
-    if run_all or args.demo == "basic":
-        demo_basic(sr, kafka_cfg, run_id, save_dir, use_protoc)
+    if run_all or args.example == "basic":
+        example_basic(sr, kafka_cfg, run_id, save_dir, use_protoc)
 
-    if run_all or args.demo == "delete":
-        demo_delete_protection(sr, run_id)
+    if run_all or args.example == "delete":
+        example_delete_protection(sr, run_id)
 
-    if run_all or args.demo == "evolution":
-        demo_evolution(sr, kafka_cfg, run_id, save_dir, use_protoc)
+    if run_all or args.example == "evolution":
+        example_evolution(sr, kafka_cfg, run_id, save_dir, use_protoc)
 
-    if run_all or args.demo == "oneof":
-        demo_oneof(sr, kafka_cfg, run_id, save_dir, use_protoc)
+    if run_all or args.example == "oneof":
+        example_oneof(sr, kafka_cfg, run_id, save_dir, use_protoc)
 
-    if run_all or args.demo == "null":
-        demo_null_handling(sr, run_id, save_dir, use_protoc)
+    if run_all or args.example == "null":
+        example_null_handling(sr, run_id, save_dir, use_protoc)
 
-    if run_all or args.demo == "compat":
-        demo_compatibility(sr)
+    if run_all or args.example == "compat":
+        example_compatibility(sr)
 
-    if run_all or args.demo == "types":
-        demo_types(sr)
+    if run_all or args.example == "types":
+        example_types(sr)
 
-    if run_all or args.demo == "strategies":
-        demo_strategies(sr, run_id, save_dir, use_protoc)
+    if run_all or args.example == "strategies":
+        example_strategies(sr, run_id, save_dir, use_protoc)
 
-    if (run_all and args.mode == "full") or args.demo == "csfle":
-        demo_csfle(sr, kafka_cfg, run_id, cfg.get("aws_kms_key_arn", ""), save_dir, use_protoc)
+    if (run_all and args.mode == "full") or args.example == "csfle":
+        example_csfle(sr, kafka_cfg, run_id, cfg.get("aws_kms_key_arn", ""), save_dir, use_protoc)
 
-    if run_all or args.demo == "no-auto-register":
-        demo_no_auto_register(sr, kafka_cfg, run_id, save_dir, use_protoc)
+    if run_all or args.example == "no-auto-register":
+        example_no_auto_register(sr, kafka_cfg, run_id, save_dir, use_protoc)
 
     logger.info(f"\n{'─' * 100}")
     logger.info(f"  Done. All topics/subjects use suffix '-{run_id}'.")
